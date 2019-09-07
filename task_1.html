@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link href='https://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic-ext,latin-ext,cyrillic' rel='stylesheet' type='text/css'>
+	</head>
+	<style>
+		body {
+			font-family: 'Roboto', sans-serif;
+		}
+
+		.wrapper {
+			width:1024px;
+			margin: 0 auto;
+		}
+
+		.cube-wrap {
+			position: relative;
+			margin: 0 auto;
+			border: 2px solid red;
+		}
+
+		.cube {
+			position: absolute;
+			top: 50%;
+			margin-top: -50%;
+			width: 100%;
+			box-sizing: border-box;
+			border: 5px solid #000;
+		}
+
+		.cube::before{
+			content:"";
+			display:block;
+			padding-top:100%;
+		}
+
+	</style>
+	
+	<body>
+		<div class="wrapper">
+			<section class="text">
+				<h2>Задание 1</h2>
+				<p>
+					Тут все просто. Нужно задать высоту элемента cube равную его ширине, и вертикально выровнять относительно родителя.<br>
+					Правда js использовать нельзя.¯\_(ツ)_/¯
+				</p>
+			</section>
+			<section class="task task1">
+				<div class='cube-wrap'>
+					<div class="cube"></div>
+				</div>
+			</section>
+		</div>
+	</body>
+
+	<script>
+		(function setCubeSize() {
+			function randomise(min, max) {
+				var val = Math.random() * (max - min) + min;
+				return Math.round(val)
+			}
+			var cubeWrap = document.querySelector('.cube-wrap');
+			cubeWrap.style.width = randomise(200, 500) + 'px';
+			cubeWrap.style.height = randomise(400, 800) + 'px'
+		})();
+	</script>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link href='https://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic-ext,latin-ext,cyrillic' rel='stylesheet' type='text/css'>
+	</head>
+	<style>
+		body {
+			font-family: 'Roboto', sans-serif;
+		}
+
+		.wrapper {
+			width:1024px;
+			margin: 0 auto;
+		}
+
+		.task {
+			width: 100%;
+		}
+
+		canvas {
+			display: block;
+			width: 300px;
+			height: 300px;
+			margin: 0 auto;
+			border: 2px solid red;
+			image-rendering: crisp-edges;
+		}
+
+	</style>
+	
+	<body>
+		<div class="wrapper">
+			<section class="text">
+				<h2>Задание 2</h2>
+				<p>
+					Тут уже задача посложнее. Нужно нарисовать картинку border.png на canvas-е с сохранением пропорций и качества.<br>
+					Размер canvas-а оставить неизменным (300х300).( ͡° ͜ʖ ͡°)
+			</section>
+			<section class="task task2">
+				<canvas id='canvas'></canvas>
+			</section>
+		</div>
+	</body>
+
+	<script>
+		const canvas = document.querySelector('#canvas');
+		const ctx = canvas.getContext('2d');	
+		const img = new Image();
+
+
+		canvas.height = 300; //По условию задания
+		img.src = 'border.png';	
+
+		//В данном случае, со сглаживанием выглядит качественней
+		//ctx.imageSmoothingEnabled = false;
+
+		img.addEventListener('load', e => {
+			const imgHeight = canvas.width / (img.width / img.height);
+			ctx.drawImage(img, 0, 0, canvas.width, imgHeight);
+		});
+	</script>
+</html>

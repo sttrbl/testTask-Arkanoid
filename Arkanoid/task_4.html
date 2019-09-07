@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link href='https://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic-ext,latin-ext,cyrillic' rel='stylesheet' type='text/css'>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+	<style>
+		body {
+			font-family: 'Roboto', sans-serif;
+		}
+
+		.wrapper {
+			width: 1024px;
+			margin: 0 auto;
+		}
+
+		.task {
+			width: 100%;
+		}
+
+		#canvas {
+			display: block;
+			width: 300px;
+			height: 300px;
+			margin: 0 auto;
+			border: 2px solid red;
+			cursor: pointer;
+		}
+		
+		.text ol {
+			padding-left: 1em;
+		}
+	</style>
+	
+	<body>
+		<div class="wrapper">
+			<section class="text">
+				<h2>Задание 4</h2>
+				<p>Финишная прямая. Реализуйте игру «Arkanoid».</p>
+				<p><b>Требования:</b></p>
+				<ol>
+					<li>Для отрисовки игры используйте canvas</li>
+					<li>Игру надо сделать без использования сторонних библиотек.</li>
+					<li>Реализуйте один уровень игры арконоид</li>
+					<li>Пользователь должен управлять полоской-платформой внизу</li>
+					<li>Должен быть шарик, который отталкивается от стен, платформы и блоков</li>
+					<li>Должны быть блоки, которые пропадают после столкновения с шариком</li>
+				</ol>
+			</section>
+			<section class="task task4">
+				<canvas id='canvas' width="300" height="300"></canvas>
+			</section>
+		</div>
+	</body>
+
+	<script>
+
+		class Platform {
+			width = 100;
+			height = 20;
+			x = (300 - this.width) / 2;
+			y = 300 - this.height - 20;
+
+			constructor() {
+				this.img = new Image();   
+				this.img.src = 'platform.png';
+			}
+		}
+
+		class Ball {
+			radius = 8;
+			speed = 200;
+			dirY = -1;
+			dirX = Math.random() > 0.5 ? 1 : -1;
+			x = 150 + Math.round(Math.random() * (Math.random() > 0.45 ? -70 : 70) );
+			y = 230 + Math.round(Math.random() * (Math.random() > 0.3 ? -10 : 10) );
+		}
+
+		class Block {
+			width = 55;
+			height = 20;
+
+			constructor({x,y} = {}) {
+				this.img = new Image();  
+				this.img.src = 'block.png';
+				this.x = x;
+				this.y = y;
+			}
+		}
+		
+
+		class Game {
+			state = 'inactive';
+			cols = 4;
+			rows = 3;
+
+			constructor(canvasElem) {
+				this.canvas = canvasElem;
+				this.ctx = this.canvas.getContext('2d');
+				this.width = this.canvas.width;
+				this.height = this.canvas.height;
+
+				canvasElem.addEventListener('click', e => {
+					if (game.state != 'active') game.start();
+				});
+
+				this.draw();
+			}
+
+			drawPlatform() {
+				this.ctx.drawImage(this.platform.img, this.platform.x, this.platform.y, this.platform.width, this.platform.height);
+			}
+
+			drawBall() {
+				this.ctx.beginPath();
+				this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI*2);
+				this.ctx.stroke();
+				this.ctx.closePath();
+			}
+
+			drawBlock({img, x, y, width, height}) {
+				this.ctx.drawImage(img, x, y, width, height);
+			}
+
+			drawGame() {
+				this.drawBall();
+				this.drawPlatform();
+				this.blocks.forEach(item => this.drawBlock(item));
+			}
+
+			drawMenu(message = 'Arkanoid.js') {
+				this.ctx.fillStyle = "#292929";
+				this.ctx.font = 'bold 22px Arial';
+				this.ctx.textAlign = "center";
+				this.ctx.fillText(message, this.width / 2, 140);
+
+				this.ctx.font = '14px Arial';				
+				this.ctx.fillText('Щёлкните по канве, чтобы начать игру', this.width / 2, 165);
+			}
+
+			draw() {
+				this.ctx.clearRect(0, 0, this.width, this.height);
+				
+				switch (this.state) {
+					case 'inactive':
+						this.drawMenu()
+						break;
+
+					case 'active':
+						this.drawGame()
+						requestAnimationFrame(this.draw.bind(this));  
+						break;
+
+					case 'lose':
+						this.drawMenu('Вы проиграли!')
+						break;
+
+					case 'win':
+						this.drawMenu('Вы победили!') 
+						break;
+				}
+
+			}
+
+			init() {
+				this.platform = new Platform();
+				this.ball = new Ball();
+				this.blocks = [...Array(this.cols * this.rows)];
+
+				const betweenSpaceX = ( this.width - (new Block().width * this.cols) ) / (this.cols + 1);
+				const betweenSpaceY = 15;
+
+				this.blocks.reduce((lastBlockCoord, item, i, arr) => {
+					arr[i] = new Block({x: lastBlockCoord[0], y: lastBlockCoord[1]});
+
+					if ((i + 1) % this.cols) {
+						lastBlockCoord[0] += arr[i].width + betweenSpaceX;
+					} else {
+						lastBlockCoord[0] = betweenSpaceX;
+						lastBlockCoord[1] += arr[i].height + betweenSpaceY;
+					}	
+
+					return lastBlockCoord;
+				}, [betweenSpaceX, betweenSpaceY]);
+
+
+				document.addEventListener('mousemove', e => {
+					this.movePlatform(e.pageX);
+				});
+
+				this.state = 'active';
+			}
+			
+			start() {
+				this.init();
+				this.draw();
+
+				let ballMover = setInterval(() => {
+					if (this.state != 'active') clearInterval(ballMover);
+
+					this.moveBall();
+				}, 1000 / this.ball.speed);
+			}
+
+			movePlatform(posX) {
+				let scrollWidth = Math.max(
+					document.body.scrollWidth, document.documentElement.scrollWidth,
+					document.body.offsetWidth, document.documentElement.offsetWidth,
+					document.body.clientWidth, document.documentElement.clientWidth
+				);
+
+				const leftLimitX = scrollWidth / 2 - this.width / 2 + this.platform.width / 2;  
+				const rightLimitX =  scrollWidth / 2 + this.width / 2 - this.platform.width / 2;
+
+				this.platform.x = posX < leftLimitX ? 0 : (posX > rightLimitX ? this.width - this.platform.width : posX - leftLimitX);
+			}
+
+			moveBall() {
+				const ballLeft = this.ball.x - this.ball.radius;
+				const ballRight = this.ball.x + this.ball.radius;
+				const ballTop = this.ball.y - this.ball.radius;
+				const ballBottom = this.ball.y + this.ball.radius;
+
+				//Столкновения со стенками или платформой
+				if (ballRight >= this.width || ballLeft <= 0) this.ball.dirX *= -1;
+
+				if (ballTop <= 0) this.ball.dirY *= -1;
+
+				if (ballBottom == this.platform.y + Math.round(this.ball.radius / 4)) {
+					if (ballRight >= this.platform.x && ballLeft <= this.platform.x + this.platform.width) this.ball.dirY *= -1;
+				}
+			
+				//Прроигрыш 
+				if (ballBottom >= this.height) this.state = 'lose';
+
+				//Столкновения с блоками
+				for (let [i, block] of this.blocks.entries()) {
+					if (ballTop == block.y + block.height || ballBottom == block.y ) {
+						if (ballRight >= block.x && ballLeft <= block.x + block.width) {
+							this.ball.dirY *= -1;
+							this.blocks.splice(i, 1);
+							break;
+						}
+					}
+
+					if (ballLeft == Math.round(block.x + block.width) || ballRight == Math.round(block.x) ) {
+						if (ballBottom >= block.y && ballTop <= block.y + block.height) {
+							this.ball.dirX *= -1;
+							this.blocks.splice(i, 1);
+							break;
+						}
+					}
+				}
+
+				//Победа
+				if (!this.blocks.length) this.state = 'win';
+
+				this.ball.x += this.ball.dirX;
+				this.ball.y += this.ball.dirY;
+			}
+
+		}
+
+		const game = new Game(document.querySelector("#canvas"));
+
+	</script>
+</html>

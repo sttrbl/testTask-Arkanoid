@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link href='https://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic-ext,latin-ext,cyrillic' rel='stylesheet' type='text/css'>
+	</head>
+	<style>
+		body {
+			font-family: 'Roboto', sans-serif;
+		}
+
+		.wrapper {
+			width:1024px;
+			margin: 0 auto;
+		}
+
+	</style>
+	
+	<body>
+		<div class="wrapper">
+			<section class="text">
+				<h2>Задание 3</h2>
+				<p>
+					Нужно написать метод массива, который оставляет в массиве только уникальные элементы.<br>
+					arr.unic(); ['1', '2', '1', 'js', 'css', 'js'] --> ['1', '2', 'js', 'css'] ( ಥ ʖ̯ ಥ)
+				</p>
+			</section>
+		</div>
+	</body>
+
+	<script>
+
+		Array.prototype.unic = function() {
+			this.splice(0, this.length, ...Array.from( new Set(this) ) );
+		}
+		
+		const testArr = ['1', '2', '1', 'js', 'css', 'js'];
+
+		testArr.unic();
+		console.log(testArr);
+	</script>
+</html>
