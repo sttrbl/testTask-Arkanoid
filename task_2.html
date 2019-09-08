@@ -50,14 +50,15 @@
 
 
 		canvas.height = 300; //По условию задания
-		img.src = 'border.png';	
-
-		//В данном случае, со сглаживанием выглядит качественней
-		//ctx.imageSmoothingEnabled = false;
 
 		img.addEventListener('load', e => {
 			const imgHeight = canvas.width / (img.width / img.height);
 			ctx.drawImage(img, 0, 0, canvas.width, imgHeight);
 		});
+
+		img.src = 'border.png';	
+
+		//В данном случае, со сглаживанием выглядит качественней
+		//ctx.imageSmoothingEnabled = false;
 	</script>
 </html>
