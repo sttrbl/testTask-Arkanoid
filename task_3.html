@@ -31,7 +31,7 @@
 	<script>
 
 		Array.prototype.unic = function() {
-			this.splice(0, this.length, ...Array.from( new Set(this) ) );
+			this.splice(0, this.length, ...new Set(this) );
 		}
 		
 		const testArr = ['1', '2', '1', 'js', 'css', 'js'];
